@@ -1,0 +1,115 @@
+# -*- coding: utf-8 -*-
+"""
+Spyder Editor
+
+This is a temporary script file.
+"""
+
+import numpy as np
+import pandas as pd
+from sklearn.linear_model import LinearRegression
+from sklearn.preprocessing import PolynomialFeatures
+from sklearn.model_selection import cross_val_score
+from sklearn.model_selection import LeaveOneOut
+
+
+
+
+class Wafer_class():
+    
+    def __init__(self, WaferId, order):
+        self.df = df.query('Country == @WaferId').reset_index(drop=True)
+        self.order = order
+        
+        
+        
+    def DesignMatrix_Target(self):
+        X = self.df[["Height" , "Weight", "IQ"]].values
+        y = self.df["Data"].values
+        
+        poly = PolynomialFeatures(degree = self.order)
+        X_poly = pd.DataFrame(poly.fit_transform(X))
+    
+        return X_poly , y
+    
+    
+    
+    def model_fitting(self):
+        
+        X , y = self.DesignMatrix_Target()
+        
+        model = LinearRegression()
+        model.fit(X , y)
+        
+        return model
+    
+    
+    
+    def cross_nation_validation(self, other_c):
+        
+        modeled = self.model_fitting()
+        
+        # Other country's dataset setting
+        X = other_c.df[["Height" , "Weight", "IQ"]].values
+        y = other_c.df["Data"].values
+        
+        poly = PolynomialFeatures(degree = 1)
+        X_poly = pd.DataFrame(poly.fit_transform(X))
+        
+        return modeled.score(X_poly, y)
+    
+    
+    
+    def cross_validation(self):
+        
+        X = self.df[["Height" , "Weight", "IQ"]].values
+        y = self.df["Data"].values
+        
+        CV_result = []
+        Order = ["First", "Second", "Third", "Forth", "Fifth", "Sixth", "Seventh"]
+        for i in range(1,8):
+            poly = PolynomialFeatures(degree=i)
+            X_poly = pd.DataFrame(poly.fit_transform(X))
+
+
+            loo = LeaveOneOut()
+            model = LinearRegression()
+
+            # [ -(y1 - yy1)**2 , -(y2 - yy2)**2 , ... , -(y7 - yy7)**2 ]
+            scores = cross_val_score(model, X_poly , y , scoring='neg_mean_squared_error', cv=loo, n_jobs=-1)
+
+            # Root Mean Square Error, RMSE
+            result = np.sqrt(abs(scores).mean())
+            
+            CV_result.append(result)
+        
+        df_res = pd.DataFrame({"Order" : Order , "RMSE" : CV_result})
+        
+        return df_res
+    
+
+
+
+
+def dataframe_generator():
+    
+    ##### 1. Data preparation
+    # 3 #
+    country = ["Wafer1" , "Wafer2" , "Wafer3" , "Wafer4" , "Wafer5"]
+    height = [ np.random.normal(129, 6, 1500) , np.random.normal(162, 5, 1500) , np.random.normal(172, 5, 1500) , np.random.normal(190, 5, 1500) , np.random.normal(168, 5, 1500) ]
+    weight = [ np.random.normal(38, 4, 1500) , np.random.normal(56, 5, 1500), np.random.normal(73, 5, 1500) , np.random.normal(103, 5, 1500) , np.random.normal(69, 5, 1500) ]
+    IQ = [ np.random.normal(70, 6, 1500), np.random.normal(107, 5, 1500), np.random.normal(88, 6, 1500), np.random.normal(35, 6, 1500), np.random.normal(88, 6, 1500) ]
+    y = [np.random.normal(50, 3, 1500) , np.random.normal(91, 6, 1500) , np.random.normal(88, 5, 1500) , np.random.normal(23, 2, 1500) , np.random.normal(80, 15, 1500)]
+    
+    collection_list = []
+    for i in range(len(country)):
+        df_t = pd.DataFrame({"Country" : country[i] , "Height" : height[i] , "Weight" : weight[i] , "IQ" : IQ[i] , "Data" : y[i]})
+        collection_list.append(df_t)
+    
+    df = pd.concat(collection_list).reset_index(drop=True)
+    
+    
+    return df
+
+
+df = dataframe_generator()
