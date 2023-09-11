@@ -1,0 +1,65 @@
+########## Example 1 ##########
+
+'''
+class Contact():
+    
+    all_contacts = []
+    
+    def __init__(self, name, email):
+        self.name = name
+        self.email = email
+        Contact.all_contacts.append(self)
+        
+
+class Friend(Contact):
+    
+    def __init__(self, name, email, phone):
+        super().__init__(name, email)
+        self.phone = phone
+'''
+
+
+
+
+
+
+
+########## Example 2 ##########
+
+'''
+
+class People():
+    
+    all_people = []
+    
+    def __init__(self, name, strength, intelli, p_type):
+        self.name = name
+        self.strength = strength
+        self.intelli = intelli
+        self.p_type = p_type
+        People.all_people.append(self)
+    
+    
+    def battle_ability(self):
+        if self.p_type == "STR" and "level" not in self.__dict__.keys():        ### This is how to see all attributes in an object.  self.__dict__.keys()
+            return 0.7*self.strength + 0.3*self.intelli
+        elif self.p_type == "INT" and "level" not in self.__dict__.keys():
+            return 0.3*self.strength + 0.7*self.intelli
+        elif self.p_type == "STR" and "level" in self.__dict__.keys():
+            return (0.7*self.strength + 0.3*self.intelli) * self.level
+        elif self.p_type == "INT" and "level" in self.__dict__.keys():
+            return (0.3*self.strength + 0.7*self.intelli) * self.level
+    
+
+class General(People):
+    
+    general_list = []
+    
+    def __init__(self, name, strength, intelli, p_type, level):
+        super().__init__(name, strength, intelli, p_type)                 ### When super().__init__ is used, self is not included.
+        self.level = level
+        General.general_list.append(self)
+    
+'''
+
+
