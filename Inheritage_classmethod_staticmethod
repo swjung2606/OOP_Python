@@ -24,6 +24,11 @@ class Human():
     def how_many_human(cls):
         print(f"There are {len(cls.human_list)} people.")
 
+
+    @staticmethod
+    def Free_static_method():
+        print("Don't need to use either self or cls. It's very free method.")
+
         
 
 
